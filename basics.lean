@@ -1,9 +1,7 @@
--- Conjunto de proposições??
--- arbitrary inductive type!!
+-- TODO Conjunto de proposições??
+-- TODO arbitrary inductive type!!
 
--- Arquivo para estudo do artigo das relações entre Jurisprudência Kelseniana
--- e Lógica Intuicionista (Haeusler, Rademaker, 2015)
--- Noções básicas de iALC.
+-- Arquivo com as definições dos tipos básicos de iALC e de seu cálculo de sequentes.
 -- Autor: Bernardo Alkmim
 -- bpalkmim@gmail.com
 
@@ -12,23 +10,25 @@ namespace iALCbasics
 open list
 
 constant Nominal : Type
-constant Concept : Prop
-constant Sequent : list Concept → list Prop → Prop → Type
-constant Proof {X : list Concept} {Z : list Prop} {Y : Concept} : Sequent X Z Y → Type
+constant Formula : Prop
+constant Concept : Formula
+constant Assertion : Formula
+constant Sequent : list Formula → Formula → Type
+constant Proof {X : list Formula} {Y : Formula} : Sequent X Y → Type
 
 -- ⊤
 constant Top : Concept
 -- ⊥
 constant Bot : Concept
 -- xRy
-constant Relation : Nominal → Nominal → Prop
+constant Role : Nominal → Nominal → Prop
 
 -- x:C
-constant ElementOf : Nominal → Concept → Prop
+constant ElemOf : Nominal → Concept → Prop
 -- ∀R.C
-constant Universal {X Y : Nominal} : Relation X Y → Concept → Concept
+constant Univ {X Y : Nominal} : Role X Y → Concept → Concept
 -- ∃R.C
-constant Existential {X Y : Nominal} : Relation X Y → Concept → Concept
+constant Exis {X Y : Nominal} : Role X Y → Concept → Concept
 -- C ⊑ D
 constant Sub : Concept → Concept → Concept
 -- C ⊓ D

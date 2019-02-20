@@ -1,6 +1,4 @@
--- Arquivo para estudo do artigo das relações entre Jurisprudência Kelseniana
--- e Lógica Intuicionista (Haeusler, Rademaker, 2015)
--- Listas.
+-- Arquivo para definição do tipo indutivo de listas.
 -- Autor: Bernardo Alkmim
 -- bpalkmim@gmail.com
 
