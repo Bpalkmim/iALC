@@ -7,13 +7,12 @@ namespace axiomsSCiALC
 open iALCbasics
 
 -- Identidade
--- Δ, x:δ ⇒ x:δ
-constant id {X : Nominal} {Y : Concept} {Z : list Concept} :
-	Proof (Sequent Z (ElementOf X Y))
+-- Δ, δ ⇒ δ
+constant axiom_id {Δ : list Formula} {δ : Formula} :
+	Proof (Sequent (δ :: Δ) δ)
 
--- Δ, x:⊥ ⇒ x:δ
--- aqui ver se vai o próprio X ou outro cara ou ninguém
-constant efq {X : Nominal} {Y : Concept} {Z : list Concept} :
-	Proof (Sequent (ElementOf X Bot :: Z) (ElementOf X Y))
+-- Δ, x:⊥ ⇒ δ
+constant axiom_efq {Δ : list Formula} {X : Nominal} {δ : Formula} :
+	Proof (Sequent (ElemOf X Bot :: Δ) δ)
 
 end axiomsSCiALC

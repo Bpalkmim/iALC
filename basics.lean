@@ -10,6 +10,7 @@ namespace iALCbasics
 open list
 
 constant Nominal : Type
+constant Role : Type
 constant Formula : Prop
 constant Concept : Formula
 constant Assertion : Formula
@@ -18,25 +19,29 @@ constant Proof {X : list Formula} {Y : Formula} : Sequent X Y → Type
 
 -- ⊤
 constant Top : Concept
+notation ⊤ := Top
 -- ⊥
 constant Bot : Concept
+notation ⊥ := Bot
 -- xRy
-constant Role : Nominal → Nominal → Prop
-
+constant Relation : Role → Nominal → Nominal → Assertion
 -- x:C
-constant ElemOf : Nominal → Concept → Prop
+constant ElemOf : Nominal → Concept → Assertion
 -- ∀R.C
-constant Univ {X Y : Nominal} : Role X Y → Concept → Concept
+constant Univ : Role → Concept → Concept
 -- ∃R.C
-constant Exis {X Y : Nominal} : Role X Y → Concept → Concept
+constant Exis : Role → Concept → Concept
 -- C ⊑ D
-constant Sub : Concept → Concept → Concept
+constant Subj : Concept → Concept → Concept
+notation c ⊑ d := Subj c d
 -- C ⊓ D
 constant Conj : Concept → Concept → Concept
+notation c ⊓ d := Subj c d
 -- C ⊔ D
 constant Disj : Concept → Concept → Concept
+notation c ⊔ d := Subj c d
 -- ¬C
 constant Neg : Concept → Concept
-notation ¬c := neg c
+notation ¬c := Neg c
 
 end iALCbasics

@@ -6,6 +6,7 @@ namespace promRulesSCiALC
 
 open iALCbasics
 
+-- A VER: PRECISA FAZER AQUI O MAP DE :, ∃ e ∀
 
 
 TODO completar
