@@ -7,6 +7,8 @@ namespace soundnessSCiALC
 
 open iALCbasics
 
+TODO definição de sequente válido
+
 TODO abox???????
 
 
