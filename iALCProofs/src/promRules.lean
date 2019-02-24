@@ -2,13 +2,17 @@
 -- Autor: Bernardo Alkmim
 -- bpalkmim@gmail.com
 
+import .basics
+
 namespace promRulesSCiALC
 
 open iALCbasics
 
--- A VER: PRECISA FAZER AQUI O MAP DE :, ∃ e ∀
+constant prom_n {Δ : list Formula} {X : Nominal} {δ : Formula} :
+	Proof (Sequent Δ δ) → Proof (Sequent (list.map (add_nom X) Δ) (Formula.elemOf X δ))
 
+#check prom_n
 
-TODO completar
+-- TODO completar
 
 end promRulesSCiALC

@@ -9,12 +9,12 @@ namespace rightRulesSCiALC
 open iALCbasics
 
 -- Subjunção
-constant subj_r {Δ : list Formula} {α : Formula} {β : Concept} :
-	Proof (Sequent (α :: Δ) (Formula.simple β)) → Proof (Sequent Δ (Formula.subj α β))
+constant subj_r {Δ : list Formula} {α β : Formula} :
+	Proof (Sequent (α :: Δ) β) → Proof (Sequent Δ (Formula.subj α β))
 
 -- Subjunção com nominals
-constant subj_r_n {Δ : list Formula} {X : Nominal} {α : Formula} {β : Concept} :
-	Proof (Sequent (Formula.elemOf X α :: Δ) (Formula.elemOf X (Formula.simple β))) → Proof (Sequent Δ (Formula.elemOf X (Formula.subj α β)))
+constant subj_r_n {Δ : list Formula} {X : Nominal} {α β : Formula} :
+	Proof (Sequent (Formula.elemOf X α :: Δ) (Formula.elemOf X β)) → Proof (Sequent Δ (Formula.elemOf X (Formula.subj α β)))
 
 -- Conjunção
 constant conj_r {Δ : list Formula} {α β : Concept} :
@@ -29,10 +29,10 @@ constant disj_r2 {Δ : list Formula} {α β : Concept} :
 
 -- Restrição universal
 constant forall_r {Δ : list Formula} {R : Role} {X Y : Nominal} {α : Concept} :
-	Proof (Sequent (Formula.relation R X Y :: Δ) (Formula.elemOf Y (Formula.simple α))) → Proof (Sequent Δ (Formula.elemOf X (Formula.univ R α)))
+	Proof (Sequent (Formula.relation R X Y :: Δ) (Formula.elemOf Y (Formula.simple α))) → Proof (Sequent Δ (Formula.elemOf X (Formula.univ R (Formula.simple α))))
 
 -- Restrição existencial
 constant exists_r {Δ : list Formula} {R : Role} {X Y : Nominal} {α : Concept} :
-	Proof (Sequent Δ (Formula.relation R X Y)) → Proof (Sequent Δ (Formula.elemOf Y (Formula.simple α))) → Proof (Sequent Δ (Formula.elemOf X (Formula.exis R α)))
+	Proof (Sequent Δ (Formula.relation R X Y)) → Proof (Sequent Δ (Formula.elemOf Y (Formula.simple α))) → Proof (Sequent Δ (Formula.elemOf X (Formula.exis R (Formula.simple α))))
 
 end rightRulesSCiALC

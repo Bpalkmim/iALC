@@ -21,7 +21,7 @@ constants x y : Nominal
 constant r : Role
 
 -- Variáveis úteis
-variable seq_concl : Proof (Sequent nil (Formula.elemOf x (Formula.subj (Formula.exis r Bot) Bot)))
+variable seq_concl : Proof (Sequent nil (Formula.elemOf x (Formula.subj (Formula.exis r (Formula.simple Bot)) (Formula.simple Bot))))
 
 -- TODO completar
 
