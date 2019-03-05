@@ -24,4 +24,8 @@ constant contr {Δ : list Formula} {δ δ1 : Formula} :
 constant perm {Δ1 Δ2 : list Formula} {δ1 δ2 δ : Formula} :
 	Proof (Sequent ((δ1 :: Δ1) ++ (δ2 :: Δ2)) δ) → Proof (Sequent ((δ2 :: Δ1) ++ (δ1 :: Δ2)) δ)
 
+-- Permutação apenas na cabeça da lista
+constant perm_head {Δ : list Formula} {δ1 δ2 δ : Formula} :
+	Proof (Sequent (δ1 ::(δ2 :: Δ)) δ) → Proof (Sequent (δ2 ::(δ1 :: Δ)) δ)
+
 end structRulesSCiALC

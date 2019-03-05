@@ -8,11 +8,13 @@ namespace promRulesSCiALC
 
 open iALCbasics
 
-constant prom_n {Δ : list Formula} {X : Nominal} {δ : Formula} :
+constant prom_n {Δ : list Formula} {δ : Formula} (X : Nominal) :
 	Proof (Sequent Δ δ) → Proof (Sequent (list.map (add_nom X) Δ) (Formula.elemOf X δ))
 
-#check prom_n
+constant prom_forall {Δ : list Formula} {δ : Formula} (R : Role) :
+	Proof (Sequent Δ δ) → Proof (Sequent (list.map (add_univ R) Δ) (Formula.univ R δ))
 
--- TODO completar
+constant prom_exists {Δ : list Formula} {α β : Formula} (R : Role) :
+	Proof (Sequent (α :: Δ) β) → Proof (Sequent (Formula.exis R α :: (list.map (add_univ R) Δ)) (Formula.exis R β))
 
 end promRulesSCiALC

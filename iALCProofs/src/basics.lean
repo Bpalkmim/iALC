@@ -21,8 +21,8 @@ inductive Formula
 | univ : Role → Formula → Formula
 | exis : Role → Formula → Formula
 | subj : Formula → Formula → Formula
-| conj : Concept → Concept → Formula
-| disj : Concept → Concept → Formula
+| conj : Formula → Formula → Formula
+| disj : Formula → Formula → Formula
 | neg : Formula → Formula
 | elemOf : Nominal → Formula → Formula -- Asserções também são fórmulas
 | relation : Role → Nominal → Nominal → Formula
@@ -64,7 +64,7 @@ def add_exis (r : Role) : Formula → Formula
 
 constant Sequent : list Formula → Formula → Prop
 constant Proof : Prop → Type
-
+/-
 -- Definições úteis para a definição de um sequente válido, utilizada na prova de correção
 constant Interpretation : list Formula → Prop
 constant Model : Interpretation → Nominal → list Formula → Prop
@@ -106,5 +106,5 @@ def valid_seq {prec : Role} {Θ Γ : list Formula} {δ : Formula} :
 			)
 		)
 	)
-
+-/
 end iALCbasics
