@@ -28,4 +28,8 @@ constant perm {Δ1 Δ2 : list Formula} {δ1 δ2 δ : Formula} :
 constant perm_head {Δ : list Formula} {δ1 δ2 δ : Formula} :
 	Proof (Sequent (δ1 ::(δ2 :: Δ)) δ) → Proof (Sequent (δ2 ::(δ1 :: Δ)) δ)
 
+-- Permutação que troca o primeiro com o terceiro elementos
+constant perm_1_3 {Δ : list Formula} {δ1 δ2 δ3 δ : Formula} :
+	Proof (Sequent (δ1 :: (δ2 :: (δ3 :: Δ))) δ) → Proof (Sequent (δ3 :: (δ2 :: (δ1 :: Δ))) δ)
+
 end structRulesSCiALC

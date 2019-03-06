@@ -13,7 +13,7 @@ constant subj_r {Δ : list Formula} {α β : Formula} :
 	Proof (Sequent (α :: Δ) β) → Proof (Sequent Δ (Formula.subj α β))
 
 -- Subjunção com nominals
-constant subj_r_n {Δ : list Formula} {α β : Formula} (X : Nominal) :
+constant subj_r_n {Δ : list Formula} {α β : Formula} {X : Nominal} :
 	Proof (Sequent (Formula.elemOf X α :: Δ) (Formula.elemOf X β)) → Proof (Sequent Δ (Formula.elemOf X (Formula.subj α β)))
 
 -- Conjunção
