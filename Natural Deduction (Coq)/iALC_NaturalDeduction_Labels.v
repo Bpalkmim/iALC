@@ -1,5 +1,5 @@
 (**********************************************
-  iALC - Natural Deduction System
+  iALC - Labeled Natural Deduction System
   Author: Bernardo Alkmim (bpalkmim@gmail.com)
   TODO
 **********************************************)
@@ -11,7 +11,7 @@ Require Export List.
 (*Require Export iALC_NaturalDeduction_Definitions.*)
 Set Implicit Arguments.
 
-Module iALC_ND.
+Module iALC_ND_Labels.
 
 (* Definition of variables, used in the Completeness proof. *)
 Parameter ConV : Set.
@@ -34,40 +34,55 @@ Inductive Nom : Set :=
 Inductive Role : Set :=
   AtomR : RoleV → Role.
 
+(* Constructor for labels. *)
+Inductive Label : Set :=
+  | ExisL : RoleV → Label
+  | UnivL : RoleV → Label
+.
+
 (* Constructor for Concepts. *)
 Inductive Concept : Set :=
-  | Top : Concept
-  | Bot : Concept
-  | AtomC : ConV → Concept
-  | Conj : Concept → Concept → Concept
-  | Disj : Concept → Concept → Concept
-  | Neg : Concept → Concept
-  | Univ : Role → Concept → Concept
-  | Exis : Role → Concept → Concept
-  | Subj : Concept → Concept → Concept
-  | NCon : Nom → Concept → Concept
+  | Top : list Label → Concept
+  | Bot : list Label → Concept
+  | AtomC : ConV → list Label → Concept
+  | Conj : Concept → Concept → list Label → Concept
+  | Disj : Concept → Concept → list Label → Concept
+  | Neg : Concept → list Label → Concept
+  | Univ : Role → Concept → list Label → Concept
+  | Exis : Role → Concept → list Label → Concept
+  | Subj : Concept → Concept → list Label → Concept
+  | NCon : Nom → Concept → list Label → Concept
 .
 
 (* Useful notations. *)
-Notation "⊤" := Top (at level 0).
-Notation "⊥" := Bot (at level 0).
 Notation "' C" := (AtomC C) (at level 1).
 Notation "# R" := (RoleV R) (at level 1).
 Notation "$ N" := (NomV N) (at level 1).
-Notation "C ⊓ D" := (Conj C D) (at level 15, right associativity).
-Notation "C ⊔ D" := (Disj C D) (at level 15, right associativity).
-Notation "¬ C" := (Neg C) (at level 75, right associativity).
-Notation "∀ R . C" := (Univ R C) (at level 5, right associativity).
-Notation "∃ R . C" := (Exis R C) (at level 5, right associativity).
-Notation "C ⊑ D" := (Subj C D) (at level 16, right associativity).
-Notation "x ∈ C" := (NCon x C) (at level 25, right associativity).
+Notation "⊤" := (Top nil) (at level 0).
+Notation "⊤ L" := (Top L) (at level 0).
+Notation "⊥" := (Bot nil) (at level 0).
+Notation "⊥ L" := (Bot L) (at level 0).
+Notation "C ⊓ D" := (Conj C D nil) (at level 15, right associativity).
+Notation "( C ⊓ D ) L" := (Conj C D L) (at level 15, right associativity).
+Notation "C ⊔ D" := (Disj C D nil) (at level 15, right associativity).
+Notation "( C ⊔ D ) L" := (Disj C D L) (at level 15, right associativity).
+Notation "¬ C" := (Neg C nil) (at level 75, right associativity).
+Notation "( ¬ C ) L" := (Neg C L) (at level 75, right associativity).
+Notation "∀ R . C" := (Univ R C nil) (at level 5, right associativity).
+Notation "( ∀ R . C ) L" := (Univ R C L) (at level 5, right associativity).
+Notation "∃ R . C" := (Exis R C nil) (at level 5, right associativity).
+Notation "( ∃ R . C ) L" := (Exis R C L) (at level 5, right associativity).
+Notation "C ⊑ D" := (Subj C D nil) (at level 16, right associativity).
+Notation "( C ⊑ D ) L" := (Subj C D L) (at level 16, right associativity).
+Notation "x ∈ C" := (NCon x C nil) (at level 25, right associativity).
+Notation "( x ∈ C ) L" := (NCon x C L) (at level 25, right associativity).
 
 (* Natural Deduction Rules *)
 (* TODO *)
 Reserved Notation "Γ ⊢ A" (at level 80).
 Inductive NDcalc : list Concept → Concept → Set :=
   (* Without nominals *)
-  | SubjI : ∀ Γ α β, α::Γ ⊢ β → Γ ⊢ α ⊑ β (* Cuidado com Labels *)
+  | SubjI : ∀ Γ α β L1 L2, α::Γ ⊢ β → Γ ⊢ α ⊑ β (* Cuidado com Labels *)
   | SubjE : ∀ Γ α β, Γ ⊢ α → Γ ⊢ α ⊑ β → Γ ⊢ β
   | NegI : ∀ Γ α, α::Γ ⊢ ⊥ → Γ ⊢ ¬α
   | NegE : ∀ Γ α, Γ ⊢ α → Γ ⊢ ¬α → Γ ⊢ ⊥
@@ -229,15 +244,6 @@ Proof.
   apply SubjIn.
   apply SubjIn.
   apply @UnivI with (y := y).
-  Admitted.
-
-Lemma proof4 : ∀ Γ R x (y : Nom), Γ ⊢ (x ∈ ((Exis R ⊥) ⊑ ⊥)).
-Proof.
-  intros.
-  apply SubjIn.
-  apply @Efqn with (x := y).
-  apply @ExisE with (R := R) (x := x).
-  apply Hyp. apply in_eq.
-Qed.
+  
 
 End iALC_ND.
