@@ -38,78 +38,84 @@ Inductive Role : Set :=
 Inductive Label : Set :=
   | ExisL : RoleV → Label
   | UnivL : RoleV → Label
+  | NegL : Label → Label
 .
 
 (* Constructor for Concepts. *)
 Inductive Concept : Set :=
-  | Top : list Label → Concept
-  | Bot : list Label → Concept
-  | AtomC : ConV → list Label → Concept
-  | Conj : Concept → Concept → list Label → Concept
-  | Disj : Concept → Concept → list Label → Concept
-  | Neg : Concept → list Label → Concept
-  | Univ : Role → Concept → list Label → Concept
-  | Exis : Role → Concept → list Label → Concept
-  | Subj : Concept → Concept → list Label → Concept
-  | NCon : Nom → Concept → list Label → Concept
+  | Top : Concept
+  | Bot : Concept
+  | AtomC : Concept
+  (*| Neg : Concept → Concept -- moved to Formula (defined by subj) *)
+  | Conj : Concept → Concept → Concept
+  | Disj : Concept → Concept → Concept
+  (*| Subj : Concept → Concept → Concept -- moved to Formula *)
+  | Univ : Role → Concept → Concept
+  | Exis : Role → Concept → Concept
+.
+
+(* Formulas are concepts with a list of labels. *)
+(* TODO possible problems may arise with ⊑, ∀, ∃, ¬, rest seems ok *)
+Inductive Formula : Set :=
+  | Simple : Concept → list Label → Formula
+  | NCon : Nom → Formula → Formula (* for nominals *)
+  | Neg : Formula → list Label → Formula
+  | Subj : Formula → Formula → list Label → Formula
 .
 
 (* Useful notations. *)
 Notation "' C" := (AtomC C) (at level 1).
-Notation "# R" := (RoleV R) (at level 1).
+Notation "# R" := (AtomR R) (at level 1).
 Notation "$ N" := (NomV N) (at level 1).
-Notation "⊤" := (Top nil) (at level 0).
-Notation "⊤ L" := (Top L) (at level 0).
-Notation "⊥" := (Bot nil) (at level 0).
-Notation "⊥ L" := (Bot L) (at level 0).
-Notation "C ⊓ D" := (Conj C D nil) (at level 15, right associativity).
-Notation "( C ⊓ D ) L" := (Conj C D L) (at level 15, right associativity).
-Notation "C ⊔ D" := (Disj C D nil) (at level 15, right associativity).
-Notation "( C ⊔ D ) L" := (Disj C D L) (at level 15, right associativity).
-Notation "¬ C" := (Neg C nil) (at level 75, right associativity).
-Notation "( ¬ C ) L" := (Neg C L) (at level 75, right associativity).
-Notation "∀ R . C" := (Univ R C nil) (at level 5, right associativity).
-Notation "( ∀ R . C ) L" := (Univ R C L) (at level 5, right associativity).
-Notation "∃ R . C" := (Exis R C nil) (at level 5, right associativity).
-Notation "( ∃ R . C ) L" := (Exis R C L) (at level 5, right associativity).
+Notation "⊤" := (Simple Top nil) (at level 0).
+Notation "⊥" := (Simple Bot nil) (at level 0).
+Notation "C ⊓ D" := (Conj C D) (at level 15, right associativity).
+Notation "C ⊔ D" := (Disj C D) (at level 15, right associativity).
+Notation "¬ C" := (Neg C) (at level 75, right associativity).
+Notation "x ∈ C" := (NCon x C) (at level 25, right associativity).
+(*
 Notation "C ⊑ D" := (Subj C D nil) (at level 16, right associativity).
 Notation "( C ⊑ D ) L" := (Subj C D L) (at level 16, right associativity).
-Notation "x ∈ C" := (NCon x C nil) (at level 25, right associativity).
-Notation "( x ∈ C ) L" := (NCon x C L) (at level 25, right associativity).
+Notation "∀ R . C" := (Univ R C nil) (at level 14, right associativity).
+Notation "( ∀ R . C ) L" := (Univ R C L) (at level 14, right associativity).
+Notation "∃ R . C" := (Exis R C nil) (at level 14, right associativity).
+Notation "( ∃ R . C ) L" := (Exis R C L) (at level 14, right associativity).
+*)
 
 (* Natural Deduction Rules *)
-(* TODO *)
+(* TODO see how to force ¬L, ∀L, ∃L (lists restricted to negations, univ restrictions
+        and exis restrictions, respectively). Perhaps only semantically possible. *)
 Reserved Notation "Γ ⊢ A" (at level 80).
-Inductive NDcalc : list Concept → Concept → Set :=
+Inductive NDcalc : list Formula → Formula → Set :=
   (* Without nominals *)
-  | SubjI : ∀ Γ α β L1 L2, α::Γ ⊢ β → Γ ⊢ α ⊑ β (* Cuidado com Labels *)
-  | SubjE : ∀ Γ α β, Γ ⊢ α → Γ ⊢ α ⊑ β → Γ ⊢ β
-  | NegI : ∀ Γ α, α::Γ ⊢ ⊥ → Γ ⊢ ¬α
-  | NegE : ∀ Γ α, Γ ⊢ α → Γ ⊢ ¬α → Γ ⊢ ⊥
-  | ConjI : ∀ Γ α β, Γ ⊢ α → Γ ⊢ β → Γ ⊢ α ⊓ β (* Cuidado com Labels *)
-  | ConjE1 : ∀ Γ α β, Γ ⊢ α ⊓ β → Γ ⊢ α
-  | ConjE2 : ∀ Γ α β, Γ ⊢ α ⊓ β → Γ ⊢ β
-  | DisjI1 : ∀ Γ α β, Γ ⊢ α → Γ ⊢ α ⊔ β (* Cuidado com Labels *)
-  | DisjI2 : ∀ Γ α β, Γ ⊢ β → Γ ⊢ α ⊔ β
-  | DisjE : ∀ Γ α β δ, Γ ⊢ α ⊔ β → α::Γ ⊢ δ → β::Γ ⊢ δ → Γ ⊢ δ
+  | SubjI : ∀ Γ α β L, α::Γ ⊢ β → Γ ⊢ (Subj α β L) (* α and β are already formulas with their respective lists of labels *)
+  | SubjE : ∀ Γ α β L, Γ ⊢ α → Γ ⊢ (Subj α β L) → Γ ⊢ β
+  | NegI : ∀ Γ α L, α::Γ ⊢ ⊥ → Γ ⊢ ((¬α) L) (* Ver como definir ¬L *)
+  | NegE : ∀ Γ α L, Γ ⊢ α → Γ ⊢ ((¬α) L) → Γ ⊢ ⊥
+  | ConjI : ∀ Γ α β L, Γ ⊢ (Simple α L) → Γ ⊢ (Simple β L) → Γ ⊢ (Simple (α ⊓ β) L) (* Garantia de ter apenas ∀ : semântica?*)
+  | ConjE1 : ∀ Γ α β L, Γ ⊢ (Simple (α ⊓ β) L) → Γ ⊢ (Simple α L)
+  | ConjE2 : ∀ Γ α β L, Γ ⊢ (Simple (α ⊓ β) L) → Γ ⊢ (Simple β L)
+  | DisjI1 : ∀ Γ α β L, Γ ⊢ (Simple α L) → Γ ⊢ (Simple (α ⊔ β) L) (* Garantia de ter apenas ∃ : semântica?*)
+  | DisjI2 : ∀ Γ α β L, Γ ⊢ (Simple β L) → Γ ⊢ (Simple (α ⊔ β) L)
+  | DisjE : ∀ Γ α β δ L, Γ ⊢ (Simple (α ⊔ β) L) → (Simple α L)::Γ ⊢ δ → (Simple β L)::Γ ⊢ δ → Γ ⊢ δ
   | Efq : ∀ Γ δ, Γ ⊢ ⊥ → Γ ⊢ δ
   (* With nominals *)
-  | SubjIn : ∀ Γ α β x, (x ∈ α)::Γ ⊢ (x ∈ β) → Γ ⊢ (x ∈ α ⊑ β) (* Cuidado com Labels *)
-  | SubjEn : ∀ Γ α β x, Γ ⊢ (x ∈ α) → Γ ⊢ (x ∈ α ⊑ β) → Γ ⊢ (x ∈ β)
-  | NegIn : ∀ Γ α x, (x ∈ α)::Γ ⊢ (x ∈ ⊥) → Γ ⊢ (x ∈ ¬α)
-  | NegEn : ∀ Γ α x, Γ ⊢ (x ∈ α) → Γ ⊢ (x ∈ ¬α) → Γ ⊢ (x ∈ ⊥)
-  | ConjIn : ∀ Γ α β x, Γ ⊢ (x ∈ α) → Γ ⊢ (x ∈ β) → Γ ⊢ (x ∈ α ⊓ β) (* Cuidado com Labels *)
-  | ConjE1n : ∀ Γ α β x, Γ ⊢ (x ∈ α ⊓ β) → Γ ⊢ (x ∈ α)
-  | ConjE2n : ∀ Γ α β x, Γ ⊢ (x ∈ α ⊓ β) → Γ ⊢ (x ∈ β)
-  | DisjI1n : ∀ Γ α β x, Γ ⊢ (x ∈ α) → Γ ⊢ (x ∈ α ⊔ β) (* Cuidado com Labels *)
-  | DisjI2n : ∀ Γ α β x, Γ ⊢ (x ∈ β) → Γ ⊢ (x ∈ α ⊔ β)
-  | DisjEn : ∀ Γ α β δ x, Γ ⊢ (x ∈ α ⊔ β) → (x ∈ α)::Γ ⊢ δ → (x ∈ β)::Γ ⊢ δ → Γ ⊢ δ
+  | SubjIn : ∀ Γ α β x L1 L2 L, (x ∈ (Simple α L1))::Γ ⊢ (x ∈ (Simple β L2)) → Γ ⊢ (x ∈ (Subj (Simple α L1) (Simple β L2) L))
+  | SubjEn : ∀ Γ α β x L1 L2 L, Γ ⊢ (x ∈ (Simple α L1)) → Γ ⊢ (x ∈ (Subj (Simple α L1) (Simple β L2) L)) → Γ ⊢ (x ∈ (Simple β L2))
+  | NegIn : ∀ Γ α x L, (x ∈ α)::Γ ⊢ (x ∈ ⊥) → Γ ⊢ (x ∈ ((¬α) L))
+  | NegEn : ∀ Γ α x L, Γ ⊢ (x ∈ α) → Γ ⊢ (x ∈ ((¬α) L)) → Γ ⊢ (x ∈ ⊥)
+  | ConjIn : ∀ Γ α β x L, Γ ⊢ (x ∈ (Simple α L)) → Γ ⊢ (x ∈ (Simple β L)) → Γ ⊢ (x ∈ (Simple (α ⊓ β) L))
+  | ConjE1n : ∀ Γ α β x L, Γ ⊢ (x ∈ (Simple (α ⊓ β) L)) → Γ ⊢ (x ∈ (Simple α L))
+  | ConjE2n : ∀ Γ α β x L, Γ ⊢ (x ∈ (Simple (α ⊓ β) L)) → Γ ⊢ (x ∈ (Simple β L))
+  | DisjI1n : ∀ Γ α β x L, Γ ⊢ (x ∈ (Simple α L)) → Γ ⊢ (x ∈ (Simple (α ⊔ β) L))
+  | DisjI2n : ∀ Γ α β x L, Γ ⊢ (x ∈ (Simple β L)) → Γ ⊢ (x ∈ (Simple (α ⊔ β) L))
+  | DisjEn : ∀ Γ α β δ x L, Γ ⊢ (x ∈ (Simple (α ⊔ β) L)) → (x ∈ (Simple α L))::Γ ⊢ δ → (x ∈ (Simple β L))::Γ ⊢ δ → Γ ⊢ δ
   | Efqn : ∀ Γ δ x, Γ ⊢ (x ∈ ⊥) → Γ ⊢ δ
   (* ∃ and ∀ rules - how to guarantee x ≼ y ? Only semantically *)
-  | ExisI : ∀ Γ α R x y, Γ ⊢ (y ∈ α) → Γ ⊢ x ∈ (Exis R α) (* Cuidado com Labels *)
-  | ExisE : ∀ Γ α R x y, Γ ⊢ x ∈ (Exis R α) → Γ ⊢ (y ∈ α)
-  | UnivI : ∀ Γ α R x y, Γ ⊢ (y ∈ α) → Γ ⊢ x ∈ (Univ R α)
-  | UnivE : ∀ Γ α R x y, Γ ⊢ x ∈ (Univ R α) → Γ ⊢ (y ∈ α)
+  | ExisI : ∀ Γ α R x y L, Γ ⊢ (y ∈ (Simple α ((ExisL R)::L))) → Γ ⊢ x ∈ (Simple (Exis (#R) α) L)
+  | ExisE : ∀ Γ α R x y L, Γ ⊢ x ∈ (Simple (Exis (#R) α) L) → Γ ⊢ (y ∈ (Simple α ((ExisL R)::L)))
+  | UnivI : ∀ Γ α R x y L, Γ ⊢ (y ∈ (Simple α ((UnivL R)::L))) → Γ ⊢ x ∈ (Simple (Univ (#R) α) L)
+  | UnivE : ∀ Γ α R x y L, Γ ⊢ x ∈ (Simple (Univ (#R) α) L) → Γ ⊢ (y ∈ (Simple α ((UnivL R)::L)))
   (* Structural rules TODO *)
   | Hyp : ∀ Γ α, In α Γ → Γ ⊢ α
   where "Γ ⊢ A" := (NDcalc Γ A).
@@ -117,22 +123,22 @@ Inductive NDcalc : list Concept → Concept → Set :=
 
 (* Casos de teste *)
 (* Sem Nominals *)
-Lemma ConjComm : ∀ Γ C D, Γ ⊢ ((D ⊓ C) ⊑ (C ⊓ D)).
+Lemma ConjComm : ∀ Γ C D L, Γ ⊢ (Subj (Simple (D ⊓ C) L) (Simple (C ⊓ D) L) nil).
 Proof.
   intros.
   apply SubjI.
   apply ConjI.
-  - apply @ConjE2 with (α := D).
+  - apply ConjE2 with (α := D).
     apply Hyp. apply in_eq.
-  - apply @ConjE1 with (β := C).
+  - apply ConjE1 with (β := C).
     apply Hyp. apply in_eq.
 Qed.
 
-Lemma DisjComm : ∀ Γ C D, Γ ⊢ ((D ⊔ C) ⊑ (C ⊔ D)).
+Lemma DisjComm : ∀ Γ C D L, Γ ⊢ (Subj (Simple (D ⊔ C) L) (Simple (C ⊔ D) L) nil).
 Proof.
   intros.
   apply SubjI.
-  apply @DisjE with (α := D) (β := C).
+  apply DisjE with (α := D) (β := C) (L := L).
   - apply Hyp. apply in_eq.
   - apply DisjI2.
     apply Hyp. apply in_eq.
@@ -140,7 +146,8 @@ Proof.
     apply Hyp. apply in_eq.
 Qed.
 
-Lemma SubjABA : ∀ Γ C D, Γ ⊢ (C ⊑ (D ⊑ C)).
+Lemma SubjABA : ∀ Γ C D L1 L2 L3 L4, (* Γ ⊢ C ⊑ (C ⊑ D) *)
+  Γ ⊢ (Subj (Simple C L1) (Subj (Simple D L2) (Simple C L1) L3) L4).
 Proof.
   intros.
   apply SubjI.
@@ -148,20 +155,22 @@ Proof.
   apply Hyp. apply in_cons. apply in_eq.
 Qed.
 
-Lemma ModusTollensAlmost : ∀ Γ C D, Γ ⊢ ((C ⊑ D) ⊑ ((¬D) ⊑ ¬C)).
+Lemma ModusTollensAlmost : ∀ Γ C D L1 L2 L3 L4, (* Γ ⊢ (C ⊑ D) ⊑ (¬D ⊑ ¬C) *)
+  Γ ⊢ (Subj (Subj (Simple C L1) (Simple D L2) L1) (Subj ((¬(Simple D L2)) L2) ((¬(Simple C L1)) L1) L3) L4).
 Proof.
   intros.
   apply SubjI.
   apply SubjI.
   apply NegI.
-  apply NegE with (α := D).
-  - apply SubjE with (α := C).
+  apply NegE with (α := Simple D L2) (L := L2).
+  - apply SubjE with (α := Simple C L1) (L:= L1).
     * apply Hyp. apply in_eq.
     * apply Hyp. apply in_cons. apply in_cons. apply in_eq.
   - apply Hyp. apply in_cons. apply in_eq.
 Qed.
 
-Lemma EfqTest : ∀ Γ C D G, (C ⊑ D :: (C ⊓ ¬D) :: Γ) ⊢ G.
+Lemma EfqTest : ∀ Γ C D G L, (* (C ⊑ D :: (C ⊓ ¬D) :: Γ) ⊢ G *)
+  (() :: (Simple (C ⊓ ¬(Simple D L)) L) :: Γ) ⊢ G.
 Proof.
   intros.
   apply Efq.
